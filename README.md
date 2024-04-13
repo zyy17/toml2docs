@@ -85,22 +85,23 @@ And it will output the following Markdown file:
 
 ## How to use
 
-1. Build the project:
+### Use the docker image
 
-   ```
-   make
-   ```
+```console
+docker run \
+  -v $(pwd):/data --rm toml2docs/toml2docs:latest \
+  -i /data/config.toml
+```
 
-   The `toml2docs` will be generated in `bin/`.
+- `-i/--input`: Specifies the input toml file.
+- `-o/--output`: Specifies the output markdown file. If not specified, the output will be printed to stdout.
 
-2. Provide the input file and generate the Markdown file(output to stdout by default)
+### Build from source
 
-   ```
-   ./bin/toml2docs -i <input-file>
-   ```
-   
-   You can also specify the output file:
-   
-   ```
-   ./bin/toml2docs -i <input-file> -o <output-file>
-   ```
+Run the following commands to build the `toml2docs`:
+
+```console
+make
+```
+
+The `toml2docs` will be generated in `bin/`.
