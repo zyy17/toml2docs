@@ -105,7 +105,7 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 			}
 
 			// Move to the next node.
-			cursor = cursor + 1
+			cursor++
 		case unstable.KeyValue:
 			n := peek(nodes, cursor+1)
 			if n == nil {
@@ -114,7 +114,7 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 
 			if n.Kind == unstable.Array {
 				// Skip the array node. The actual value is the next node.
-				cursor = cursor + 1
+				cursor++
 			}
 
 			nn := peek(nodes, cursor+2)

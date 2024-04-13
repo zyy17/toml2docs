@@ -1,0 +1,56 @@
+name: CI
+
+on: [
+  push,
+  pull_request
+]
+
+env:
+  GO_VERSION: "1.21"
+
+jobs:
+  typos-check:
+    name: spell-typos-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+
+      - name: Check spelling with custom config file
+        uses: crate-ci/typos@v1.14.8
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54
+          # '-v' flag is required to show the output of golangci-lint.
+          args: -v
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    needs: [ lint ]
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run unit tests
+        run: |
+          make test

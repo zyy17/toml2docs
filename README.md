@@ -1,6 +1,6 @@
 # 🚧 toml2docs
 
-`toml2docs` is a tool to generate a Markdown document from toml.
+`toml2docs` is a tool that generates a Markdown document from toml.
 
 The tool will discover the comments from the toml file and generate a description for each field.  For example:
 
