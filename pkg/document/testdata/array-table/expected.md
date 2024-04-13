@@ -1,10 +1,10 @@
-| Key | Default | Descriptions |
-| --- | ------- | ----------- |
-| `engine[0].name` | `sqlite` | -- |
-| `engine[0].path` | `db.sqlite` | -- |
-| `engine[1].name` | `postgres` | -- |
-| `engine[1].path` | `/var/lib/postgresql/data` | -- |
-| `engine[2].name` | `mysql` | -- |
-| `engine[2].path` | `/var/lib/mysql/data` | -- |
-| `proxy[0].name` | `haproxy` | -- |
-| `proxy[1].name` | `nginx` | -- |
+| Key | Type | Default | Descriptions |
+| --- | -----| ------- | ----------- |
+| `engine[0].name` | String | `sqlite` | -- |
+| `engine[0].path` | String | `db.sqlite` | -- |
+| `engine[1].name` | String | `postgres` | -- |
+| `engine[1].path` | String | `/var/lib/postgresql/data` | -- |
+| `engine[2].name` | String | `mysql` | -- |
+| `engine[2].path` | String | `/var/lib/mysql/data` | -- |
+| `proxy[0].name` | String | `haproxy` | -- |
+| `proxy[1].name` | String | `nginx` | -- |

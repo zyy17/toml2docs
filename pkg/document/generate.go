@@ -13,6 +13,10 @@ type GenerateOptions struct {
 	DebugMode bool
 }
 
+const (
+	PlaceholderForEmpty = "--"
+)
+
 // GenerateMarkdown generates a markdown file from the input toml data.
 func GenerateMarkdown(input []byte, opts *GenerateOptions) (string, error) {
 	nodes, err := parse(input)
@@ -43,6 +47,7 @@ type tomlNode struct {
 type docItem struct {
 	key     string
 	val     string
+	typ     string
 	comment string
 }
 
@@ -123,9 +128,10 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 			}
 
 			items = append(items, &docItem{
-				comment: comment,
-				val:     string(n.Data),
-				key:     key,
+				key:     normalize(key, true),
+				val:     normalize(string(n.Data), true),
+				typ:     normalize(n.Kind.String(), false),
+				comment: normalize(comment, false),
 			})
 
 			// Take the comment and reset it.
@@ -158,9 +164,10 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 				return nil, fmt.Errorf("missing key for table")
 			}
 			items = append(items, &docItem{
-				comment: comment,
-				val:     "",
-				key:     parentKey,
+				key:     normalize(parentKey, true),
+				val:     normalize("", true),
+				typ:     normalize("", false),
+				comment: normalize(comment, false),
 			})
 
 			// Take the comment and reset it.
@@ -202,33 +209,11 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 
 func doGenerateMarkdown(items []*docItem) (string, error) {
 	buf := strings.Builder{}
-	buf.WriteString("| Key | Default | Descriptions |\n")
-	buf.WriteString("| --- | ------- | ----------- |\n")
+	buf.WriteString("| Key | Type | Default | Descriptions |\n")
+	buf.WriteString("| --- | -----| ------- | ----------- |\n")
 
 	for _, item := range items {
-		var (
-			key     = item.key
-			val     = item.val
-			comment = item.comment
-		)
-
-		if len(val) == 0 {
-			val = "--"
-		} else {
-			val = "`" + val + "`"
-		}
-
-		if len(comment) == 0 {
-			comment = "--"
-		}
-
-		if len(key) == 0 {
-			key = "--"
-		} else {
-			key = "`" + key + "`"
-		}
-
-		buf.WriteString(fmt.Sprintf("| %s | %s | %s |\n", key, val, comment))
+		buf.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n", item.key, item.typ, item.val, item.comment))
 	}
 
 	return buf.String(), nil
@@ -246,4 +231,16 @@ func peek(nodes []*tomlNode, i int) *tomlNode {
 func processComment(input string) string {
 	input2 := strings.TrimPrefix(input, " ")
 	return strings.TrimPrefix(strings.TrimPrefix(input2, "#"), " ")
+}
+
+func normalize(input string, isCode bool) string {
+	if len(input) == 0 {
+		return PlaceholderForEmpty
+	}
+
+	if isCode {
+		return "`" + input + "`"
+	}
+
+	return input
 }
