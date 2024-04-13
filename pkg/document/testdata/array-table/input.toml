@@ -1,0 +1,17 @@
+[[engine]]
+name = "sqlite"
+path = "db.sqlite"
+
+[[engine]]
+name = "postgres"
+path = "/var/lib/postgresql/data"
+
+[[engine]]
+name = "mysql"
+path = "/var/lib/mysql/data"
+
+[[proxy]]
+name = "haproxy"
+
+[[proxy]]
+name = "nginx"

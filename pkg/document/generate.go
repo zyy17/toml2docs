@@ -81,6 +81,9 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 		parentKey = ""
 		comment   = ""
 		items     []*docItem
+
+		// arrayTableIndex is used to keep track of the array table index.
+		arrayTableIndex = make(map[string]int)
 	)
 
 	// Process the nodes to generate the doc items.
@@ -162,6 +165,31 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 
 			// Take the comment and reset it.
 			comment = ""
+		case unstable.ArrayTable:
+			parentKey = ""
+			n := peek(nodes, cursor+1)
+			if n == nil {
+				return nil, fmt.Errorf("missing array table key")
+			}
+
+			var arrayKey string
+			if n.Kind == unstable.Key {
+				arrayKey = string(n.Data)
+			}
+
+			if len(parentKey) > 0 {
+				arrayKey = parentKey + "." + string(n.Data)
+			}
+
+			index := 0
+			if _, ok := arrayTableIndex[arrayKey]; ok {
+				index = arrayTableIndex[arrayKey] + 1
+				arrayTableIndex[arrayKey] = index
+			} else {
+				arrayTableIndex[arrayKey] = 0
+			}
+			parentKey = fmt.Sprintf("%s[%d]", arrayKey, index)
+			cursor += 2
 		case unstable.Array:
 			cursor += 2
 		default:

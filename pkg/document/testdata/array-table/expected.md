@@ -1,0 +1,10 @@
+| Key | Default | Descriptions |
+| --- | ------- | ----------- |
+| `engine[0].name` | `sqlite` | -- |
+| `engine[0].path` | `db.sqlite` | -- |
+| `engine[1].name` | `postgres` | -- |
+| `engine[1].path` | `/var/lib/postgresql/data` | -- |
+| `engine[2].name` | `mysql` | -- |
+| `engine[2].path` | `/var/lib/mysql/data` | -- |
+| `proxy[0].name` | `haproxy` | -- |
+| `proxy[1].name` | `nginx` | -- |
