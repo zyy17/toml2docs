@@ -83,34 +83,24 @@ And it will output the following Markdown file:
 | `processors[1].thread_num` | Integer | `4` | The aarch64 processor options. |
 | `processors[1].arch` | String | `aarch64` | -- |
 
-## How to use
+## 🚀 Quick Start
 
-### Use the docker image
+Use the docker image to experience the `toml2docs`:
 
 ```console
-docker run \
-  -v $(pwd):/data --rm toml2docs/toml2docs:latest \
-  -i /data/config.toml
+docker run --rm \
+  -v $(pwd)/pkg/document/testdata/basic:/data \
+  toml2docs/toml2docs:latest \
+  -i /data/input.toml
 ```
 
 - `-i/--input-file`: Specifies the input toml file.
 - `-o/--output-file`: Specifies the output markdown file. If not specified, the output will be printed to stdout.
 - `-t/--template-file`: Specifies the template file.
 
-### Build from source
+## Template
 
-Run the following commands to build the `toml2docs`:
-
-```console
-make
-```
-
-The `toml2docs` will be generated in `bin/`.
-
-
-### Template
-
-toml2docs supports to generate docs from a template file, for example, you can provide a template file like this:
+toml2docs supports generating docs from a template file. For example, you can provide a template file like this:
 
 ```markdown
 # Configurations
@@ -124,4 +114,19 @@ toml2docs supports to generate docs from a template file, for example, you can p
 {{ toml2docs "./testdata/templates/frontend.toml" }}
 ```
 
-The run with the `-t/--template-file` option and the `{{ toml2docs <file> }}` function will be replaced with the generated docs.
+Then run with the `-t/--template-file` option and the `{{ toml2docs <file> }}` section will be replaced with the generated docs.
+
+## Development
+
+### Build and Test
+
+Run the following commands to build the `toml2docs`:
+
+```console
+make
+```
+
+The `toml2docs` will be generated in `bin/`.
+
+- `make test`: Run all the unit tests.
+- `make lint`: Run the lint.
