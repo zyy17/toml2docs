@@ -150,17 +150,30 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 			comment = ""
 			cursor += 3
 		case unstable.Table:
+			// Reset the parent key.
+			parentKey = ""
+			for i := cursor + 1; i < len(nodes); i++ {
+				n := peek(nodes, i)
+				if n == nil {
+					cursor = i
+					break
+				}
+				if n.Kind != unstable.Key {
+					cursor = i
+					break
+				}
+
+				// If the next node is a key, append it to the parent key.
+				if parentKey != "" {
+					parentKey = parentKey + "." + string(n.Data)
+				} else {
+					parentKey = string(n.Data)
+				}
+			}
+
 			n := peek(nodes, cursor+1)
 			if n == nil {
 				return nil, fmt.Errorf("missing key for table")
-			}
-			parentKey = string(n.Data)
-
-			nn := peek(nodes, cursor+2)
-			// If the next node is a key, append it to the parent key.
-			if nn != nil && nn.Kind == unstable.Key {
-				parentKey += "." + string(nn.Data)
-				cursor = cursor + 1
 			}
 			items = append(items, &docItem{
 				comment: comment,
@@ -170,12 +183,10 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 
 			// Take the comment and reset it.
 			comment = ""
-			cursor += 2
 		case unstable.Array:
 			cursor += 2
 		default:
-			// Stop the loop.
-			cursor = len(nodes)
+			return nil, fmt.Errorf("unexpected node kind: %s", node.Kind)
 		}
 	}
 
