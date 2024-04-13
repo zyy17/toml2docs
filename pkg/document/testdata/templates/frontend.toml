@@ -1,0 +1,5 @@
+# The frontend options.
+# Frontend options are used to configure the frontend of the application.
+[frontend]
+# The server address to bind to.
+addr = "127.0.0.1:8080"

@@ -1,0 +1,9 @@
+# Configurations
+
+## Datanode
+
+{{ toml2docs "./testdata/templates/datanode.toml" }}
+
+## Frontend
+
+{{ toml2docs "./testdata/templates/frontend.toml" }}

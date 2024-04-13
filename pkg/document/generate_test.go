@@ -21,14 +21,37 @@ func TestGenerateMarkdown(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		data, err := os.ReadFile(tt.input)
+		got, err := GenerateMarkdownFromFile(tt.input, nil)
 		if err != nil {
-			t.Fatalf("failed to read the input file: %v", err)
+			t.Fatalf("failed to generate markdown from file '%s': %v", tt.input, err)
 		}
 
-		got, err := GenerateMarkdown(data, nil)
+		expected, err := os.ReadFile(tt.expected)
 		if err != nil {
-			t.Fatalf("failed to generate markdown: %v", err)
+			t.Fatalf("failed to read the expected file: %v", err)
+		}
+
+		if got != string(expected) {
+			t.Errorf("expected: %s, got: %s", string(expected), got)
+		}
+	}
+}
+
+func TestGenerateMarkdownFromTemplate(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			input:    "./testdata/templates/input.template",
+			expected: "./testdata/templates/expected.md",
+		},
+	}
+
+	for _, tt := range tests {
+		got, err := GenerateMarkdownFromTemplate(tt.input, nil)
+		if err != nil {
+			t.Fatalf("failed to generate markdown from file '%s': %v", tt.input, err)
 		}
 
 		expected, err := os.ReadFile(tt.expected)

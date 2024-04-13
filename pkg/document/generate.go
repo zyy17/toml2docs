@@ -2,7 +2,10 @@ package document
 
 import (
 	"fmt"
+	"os"
+	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/pelletier/go-toml/v2/unstable"
 )
@@ -38,6 +41,44 @@ func GenerateMarkdown(input []byte, opts *GenerateOptions) (string, error) {
 	}
 
 	return doGenerateMarkdown(items)
+}
+
+// GenerateMarkdownFromFile generates a markdown file from the input toml file.
+func GenerateMarkdownFromFile(filename string, opts *GenerateOptions) (string, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+
+	return GenerateMarkdown(data, opts)
+}
+
+// GenerateMarkdownFromTemplate generates a markdown file from a Go template with `toml2docs` function.
+func GenerateMarkdownFromTemplate(templateFileName string, opts *GenerateOptions) (string, error) {
+	data, err := os.ReadFile(templateFileName)
+	if err != nil {
+		return "", err
+	}
+
+	funcMap := template.FuncMap{
+		"toml2docs": toml2docs,
+	}
+
+	tmpl, err := template.New("toml2docs").Funcs(funcMap).Parse(string(data))
+	if err != nil {
+		return "", nil
+	}
+
+	w := &strings.Builder{}
+	if err := tmpl.Execute(w, nil); err != nil {
+		return "", err
+	}
+
+	return reduceRedundantNewline(w.String()), nil
+}
+
+func toml2docs(filename string) (string, error) {
+	return GenerateMarkdownFromFile(filename, nil)
 }
 
 type tomlNode struct {
@@ -85,7 +126,7 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 	var (
 		cursor    = 0
 		parentKey = ""
-		comments  = []string{}
+		comments  []string
 		items     []*docItem
 
 		// arrayTableIndex is used to keep track of the array table index.
@@ -211,7 +252,7 @@ func doGenerateMarkdown(items []*docItem) (string, error) {
 		buf.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n", item.key, item.typ, item.val, item.comment))
 	}
 
-	return buf.String(), nil
+	return reduceRedundantNewline(buf.String()), nil
 }
 
 // peek returns the node at the given index.
@@ -238,4 +279,9 @@ func normalize(input string, isCode bool) string {
 	}
 
 	return input
+}
+
+func reduceRedundantNewline(s string) string {
+	re := regexp.MustCompile(`\n+$`)
+	return re.ReplaceAllString(s, "\n")
 }

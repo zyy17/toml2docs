@@ -1,0 +1,7 @@
+# The datanode options.
+# Datanode is the data service of the cluster.
+[datanode]
+# The engine to use for the datanode.
+# - `m1`: The M1 engine.
+# - `m2`: The M2 engine.
+engine = "mito"
