@@ -41,3 +41,5 @@
 | `datanode.client.timeout` | String | `10s` | The timeout for the datanode client. |
 | `datanode.client.connect_timeout` | String | `10s` | The connect timeout for the datanode client. |
 | `datanode.client.tcp_nodelay` | Bool | `true` | Whether to enable `tcp_nodelay` for the datanode client. |
+| `wal` | -- | -- | The wal options. |
+| `wal.provider` | String | `local` | The provider of the wal.<br/>- `local`: use the local wal.<br/>- `remote`: use the remote wal. |
