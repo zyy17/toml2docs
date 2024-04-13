@@ -79,8 +79,14 @@ And it will output the following Markdown file:
 
    The `toml2docs` will be generated in `bin/`.
 
-2. Provide the input file and output path:
+2. Provide the input file and generate the Markdown file(output to stdout by default)
 
+   ```
+   ./bin/toml2docs -i <input-file>
+   ```
+   
+   You can also specify the output file:
+   
    ```
    ./bin/toml2docs -i <input-file> -o <output-file>
    ```

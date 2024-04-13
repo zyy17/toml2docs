@@ -1,0 +1,10 @@
+| Key | Default | Descriptions |
+| --- | ------- | ----------- |
+| `mysql` | -- | -- |
+| `mysql.user` | `root` | -- |
+| `mysql.tls` | -- | -- |
+| `mysql.tls.cert` | `/etc/mysql/certs/cert.pem` | -- |
+| `mysql.tls.key` | `/etc/mysql/certs/key.pem` | -- |
+| `mysql.tls.ca` | `/etc/mysql/certs/ca.pem` | -- |
+| `mysql.tls.options` | -- | -- |
+| `mysql.tls.options.mode` | `REQUIRED` | -- |

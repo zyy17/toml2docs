@@ -1,0 +1,10 @@
+[mysql]
+user = "root"
+
+[mysql.tls]
+cert = "/etc/mysql/certs/cert.pem"
+key = "/etc/mysql/certs/key.pem"
+ca = "/etc/mysql/certs/ca.pem"
+
+[mysql.tls.options]
+mode = "REQUIRED"

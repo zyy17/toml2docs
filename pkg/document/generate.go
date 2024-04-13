@@ -1,13 +1,39 @@
-package main
+package document
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/pelletier/go-toml/v2/unstable"
-	"github.com/spf13/pflag"
 )
+
+// GenerateOptions represents the options for generating the markdown file.
+type GenerateOptions struct {
+	// DebugMode enables to print debug information.
+	DebugMode bool
+}
+
+// GenerateMarkdown generates a markdown file from the input toml data.
+func GenerateMarkdown(input []byte, opts *GenerateOptions) (string, error) {
+	nodes, err := parse(input)
+	if err != nil {
+		return "", err
+	}
+
+	if opts != nil && opts.DebugMode {
+		for _, node := range nodes {
+			fmt.Printf("%s: %s\n", node.Kind, node.Data)
+		}
+		return "", nil
+	}
+
+	items, err := generateDocItems(nodes)
+	if err != nil {
+		return "", err
+	}
+
+	return doGenerateMarkdown(items)
+}
 
 type tomlNode struct {
 	Kind unstable.Kind
@@ -20,54 +46,7 @@ type docItem struct {
 	comment string
 }
 
-func main() {
-	var (
-		inputFile  string
-		outputFile string
-		debug      bool
-	)
-
-	pflag.StringVarP(&inputFile, "input-file", "i", "", "The input toml file path.")
-	pflag.StringVarP(&outputFile, "output-file", "o", "output.md", "The output markdown file path.")
-	pflag.BoolVarP(&debug, "debug", "d", false, "Print debug information.")
-	pflag.Parse()
-
-	if len(inputFile) == 0 {
-		pflag.PrintDefaults()
-		os.Exit(1)
-	}
-
-	nodes, err := parse(inputFile)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	if debug {
-		for _, node := range nodes {
-			fmt.Printf("%s: %s\n", node.Kind, node.Data)
-		}
-		os.Exit(0)
-	}
-
-	items, err := generateDocItems(nodes)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	if err := generateMarkdown(items, outputFile); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
-func parse(inputFile string) ([]*tomlNode, error) {
-	data, err := os.ReadFile(inputFile)
-	if err != nil {
-		return nil, err
-	}
-
+func parse(data []byte) ([]*tomlNode, error) {
 	// Gather all the nodes in the TOML file.
 	var nodes []*tomlNode
 
@@ -193,7 +172,7 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 	return items, nil
 }
 
-func generateMarkdown(items []*docItem, outputFile string) error {
+func doGenerateMarkdown(items []*docItem) (string, error) {
 	buf := strings.Builder{}
 	buf.WriteString("| Key | Default | Descriptions |\n")
 	buf.WriteString("| --- | ------- | ----------- |\n")
@@ -224,7 +203,7 @@ func generateMarkdown(items []*docItem, outputFile string) error {
 		buf.WriteString(fmt.Sprintf("| %s | %s | %s |\n", key, val, comment))
 	}
 
-	return os.WriteFile(outputFile, []byte(buf.String()), 0644)
+	return buf.String(), nil
 }
 
 // peek returns the node at the given index.
