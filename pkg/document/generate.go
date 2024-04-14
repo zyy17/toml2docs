@@ -19,6 +19,11 @@ type GenerateOptions struct {
 const (
 	PlaceholderForEmpty = "--"
 	BRTag               = "<br/>"
+	NoneValue           = "None"
+)
+
+const (
+	NoneDefault = "+toml2docs:none-default"
 )
 
 // GenerateMarkdown generates a markdown file from the input toml data.
@@ -90,7 +95,20 @@ type docItem struct {
 	key     string
 	val     string
 	typ     string
-	comment string
+	comment *tomlComment
+}
+
+type tomlComment struct {
+	rawComments []string
+	noneDefault bool
+}
+
+func (c *tomlComment) String() string {
+	return normalize(strings.Join(c.rawComments, BRTag), false)
+}
+
+func (c *tomlComment) IsNoneDefault() bool {
+	return c.noneDefault
 }
 
 func parse(data []byte) ([]*tomlNode, error) {
@@ -126,7 +144,7 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 	var (
 		cursor    = 0
 		parentKey = ""
-		comments  []string
+		comment   = new(tomlComment)
 		items     []*docItem
 
 		// arrayTableIndex is used to keep track of the array table index.
@@ -138,7 +156,12 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 		node := nodes[cursor]
 		switch node.Kind {
 		case unstable.Comment:
-			comments = append(comments, processComment(string(node.Data)))
+			rawComment := processComment(string(node.Data))
+			if strings.Contains(rawComment, NoneDefault) {
+				comment.noneDefault = true
+			} else {
+				comment.rawComments = append(comment.rawComments, rawComment)
+			}
 
 			// Move to the next node.
 			cursor++
@@ -167,11 +190,11 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 				key:     normalize(key, true),
 				val:     normalize(string(n.Data), true),
 				typ:     normalize(n.Kind.String(), false),
-				comment: normalize(strings.Join(comments, BRTag), false),
+				comment: comment,
 			})
 
-			// Take the comment and reset it.
-			comments = []string{}
+			// Take the tomlComment and reset it.
+			comment = new(tomlComment)
 			cursor += 3
 		case unstable.Table:
 			// Reset the parent key.
@@ -203,11 +226,11 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 				key:     normalize(parentKey, true),
 				val:     normalize("", true),
 				typ:     normalize("", false),
-				comment: normalize(strings.Join(comments, BRTag), false),
+				comment: comment,
 			})
 
-			// Take the comment and reset it.
-			comments = []string{}
+			// Take the tomlComment and reset it.
+			comment = new(tomlComment)
 		case unstable.ArrayTable:
 			parentKey = ""
 			n := peek(nodes, cursor+1)
@@ -249,7 +272,10 @@ func doGenerateMarkdown(items []*docItem) (string, error) {
 	buf.WriteString("| --- | -----| ------- | ----------- |\n")
 
 	for _, item := range items {
-		buf.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n", item.key, item.typ, item.val, item.comment))
+		if item.comment.IsNoneDefault() {
+			item.val = normalize(NoneValue, true)
+		}
+		buf.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n", item.key, item.typ, item.val, item.comment.String()))
 	}
 
 	return reduceRedundantNewline(buf.String()), nil
