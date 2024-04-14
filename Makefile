@@ -2,6 +2,9 @@
 toml2docs:
 	GO111MODULE=on CGO_ENABLED=0 go build -o bin/toml2docs cmd/toml2docs/main.go
 
+install: toml2docs
+	mv bin/toml2docs /usr/local/bin/toml2docs
+
 .PHONY: docker
 docker:
 	docker build -t toml2docs:latest .
