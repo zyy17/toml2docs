@@ -18,8 +18,8 @@
 | `mysql.runtime_size` | Integer | `2` | The runtime size of the MySQL server. |
 | `mysql.tls` | -- | -- | The TLS options for MySQL server. |
 | `mysql.tls.mode` | String | `disable` | The mode of the MySQL server TLS. |
-| `mysql.tls.cert_path` | String | -- | The certificate path of the MySQL server TLS. |
-| `mysql.tls.key_path` | String | -- | The key path of the MySQL server TLS. |
+| `mysql.tls.cert_path` | String | `""` | The certificate path of the MySQL server TLS. |
+| `mysql.tls.key_path` | String | `""` | The key path of the MySQL server TLS. |
 | `mysql.tls.watch` | Bool | `false` | Whether to watch the certificate changes of the MySQL server TLS. |
 | `postgres` | -- | -- | The PostgresSQL server options. |
 | `postgres.enable` | Bool | `true` | Whether to enable the PostgresSQL server. |
@@ -27,8 +27,8 @@
 | `postgres.runtime_size` | Integer | `2` | The runtime size of the PostgresSQL server. |
 | `postgres.tls` | -- | -- | The PostgresSQL server TLS options, see `standalone.example.toml`. |
 | `postgres.tls.mode` | String | `disable` | The mode of the PostgresSQL server TLS. |
-| `postgres.tls.cert_path` | String | -- | The certificate path of the PostgresSQL server TLS. |
-| `postgres.tls.key_path` | String | -- | The key path of the PostgresSQL server TLS. |
+| `postgres.tls.cert_path` | String | `""` | The certificate path of the PostgresSQL server TLS. |
+| `postgres.tls.key_path` | String | `""` | The key path of the PostgresSQL server TLS. |
 | `postgres.tls.watch` | Bool | `false` | Whether to watch the certificate changes of the PostgresSQL server TLS. |
 | `prom_store` | -- | -- | The prometheus service options. |
 | `prom_store.enable` | Bool | `true` | Whether to enable the prometheus service. |

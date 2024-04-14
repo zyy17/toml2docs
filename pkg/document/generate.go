@@ -232,30 +232,47 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 			// Take the tomlComment and reset it.
 			comment = new(tomlComment)
 		case unstable.ArrayTable:
+			// Reset the parent key.
 			parentKey = ""
-			n := peek(nodes, cursor+1)
-			if n == nil {
-				return nil, fmt.Errorf("missing array table key")
-			}
 
-			var arrayKey string
-			if n.Kind == unstable.Key {
-				arrayKey = string(n.Data)
-			}
+			for i := cursor + 1; i < len(nodes); i++ {
+				n := peek(nodes, i)
+				if n == nil {
+					cursor = i
+					break
+				}
+				if n.Kind != unstable.Key {
+					cursor = i
+					break
+				}
 
-			if len(parentKey) > 0 {
-				arrayKey = parentKey + "." + string(n.Data)
+				// If the next node is a key, append it to the parent key.
+				if parentKey != "" {
+					parentKey = parentKey + "." + string(n.Data)
+				} else {
+					parentKey = string(n.Data)
+				}
 			}
 
 			index := 0
-			if _, ok := arrayTableIndex[arrayKey]; ok {
-				index = arrayTableIndex[arrayKey] + 1
-				arrayTableIndex[arrayKey] = index
+			if _, ok := arrayTableIndex[parentKey]; ok {
+				index = arrayTableIndex[parentKey] + 1
+				arrayTableIndex[parentKey] = index
 			} else {
-				arrayTableIndex[arrayKey] = 0
+				arrayTableIndex[parentKey] = 0
 			}
-			parentKey = fmt.Sprintf("%s[%d]", arrayKey, index)
-			cursor += 2
+
+			if index == 0 {
+				items = append(items, &docItem{
+					key:     normalize(fmt.Sprintf("[[%s]]", parentKey), true),
+					val:     normalize("", true),
+					typ:     normalize("", false),
+					comment: comment,
+				})
+				comment = new(tomlComment)
+			}
+
+			parentKey = fmt.Sprintf("%s[%d]", parentKey, index)
 		case unstable.Array:
 			cursor += 2
 		default:
@@ -275,6 +292,10 @@ func doGenerateMarkdown(items []*docItem) (string, error) {
 		if item.comment.IsNoneDefault() {
 			item.val = normalize(NoneValue, true)
 		}
+		if item.typ == "String" && item.val == PlaceholderForEmpty {
+			item.val = "`\"\"`" // indicate empty string.
+		}
+
 		buf.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n", item.key, item.typ, item.val, item.comment.String()))
 	}
 
