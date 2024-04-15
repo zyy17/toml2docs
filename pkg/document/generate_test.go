@@ -18,6 +18,14 @@ func TestGenerateMarkdown(t *testing.T) {
 			input:    "./testdata/nested/input.toml",
 			expected: "./testdata/nested/expected.md",
 		},
+		{
+			input:    "./testdata/array-table/input.toml",
+			expected: "./testdata/array-table/expected.md",
+		},
+		{
+			input:    "./testdata/comment-metadata/input.toml",
+			expected: "./testdata/comment-metadata/expected.md",
+		},
 	}
 
 	for _, tt := range tests {

@@ -271,8 +271,6 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 				})
 				comment = new(tomlComment)
 			}
-
-			parentKey = fmt.Sprintf("%s[%d]", parentKey, index)
 		case unstable.Array:
 			cursor += 2
 		default:
