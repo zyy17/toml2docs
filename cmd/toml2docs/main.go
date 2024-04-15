@@ -10,15 +10,17 @@ import (
 
 func main() {
 	var (
-		inputFile    string
-		outputFile   string
-		templateFile string
-		debug        bool
+		inputFile         string
+		outputFile        string
+		templateFile      string
+		docsCommentPrefix string
+		debug             bool
 	)
 
 	pflag.StringVarP(&inputFile, "input-file", "i", "", "The input toml file path.")
 	pflag.StringVarP(&outputFile, "output-file", "o", "", "The output markdown file path. If not provided, it will be printed to the standard output.")
 	pflag.StringVarP(&templateFile, "template-file", "t", "", "The template file path.")
+	pflag.StringVarP(&docsCommentPrefix, "docs-comment-prefix", "p", "#", "The prefix of the comments that will be used to generate the documentation.")
 	pflag.BoolVarP(&debug, "debug", "d", false, "Print debug information.")
 	pflag.Parse()
 
@@ -38,7 +40,7 @@ func main() {
 	)
 
 	if len(inputFile) > 0 {
-		docs, err = document.GenerateMarkdownFromFile(inputFile, &document.GenerateOptions{DebugMode: debug})
+		docs, err = document.GenerateMarkdownFromFile(inputFile, &document.GenerateOptions{DebugMode: debug, DocsCommentPrefix: docsCommentPrefix})
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -46,7 +48,7 @@ func main() {
 	}
 
 	if len(templateFile) > 0 {
-		docs, err = document.GenerateMarkdownFromTemplate(templateFile, &document.GenerateOptions{DebugMode: debug})
+		docs, err = document.GenerateMarkdownFromTemplate(templateFile, &document.GenerateOptions{DebugMode: debug, DocsCommentPrefix: docsCommentPrefix})
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

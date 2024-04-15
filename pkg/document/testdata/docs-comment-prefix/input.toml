@@ -1,0 +1,20 @@
+## The MySQL configuration file is used to configure the MySQL connection.
+# This is not docs comment!
+[mysql]
+# This is not docs comment!
+user = "root"
+
+## Configure the MySQL connection to use TLS/SSL.
+[mysql.tls]
+cert = "/etc/mysql/certs/cert.pem"
+key = "/etc/mysql/certs/key.pem"
+ca = "/etc/mysql/certs/ca.pem"
+
+## The TLS options section is used to configure the TLS/SSL options for the MySQL connection.
+[mysql.tls.options]
+# This is not docs comment!
+mode = "REQUIRED"
+
+# This is not docs comment!
+# This is not docs comment!
+# This is not docs comment!

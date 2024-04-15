@@ -14,6 +14,9 @@ import (
 type GenerateOptions struct {
 	// DebugMode enables to print debug information.
 	DebugMode bool
+
+	// DocsCommentPrefix is the prefix of the comments that will be used to generate the documentation.
+	DocsCommentPrefix string
 }
 
 const (
@@ -26,11 +29,18 @@ const (
 	NoneDefault = "+toml2docs:none-default"
 )
 
+// globalOpts is the global options for generating the markdown file.
+var globalOpts = &GenerateOptions{DebugMode: false, DocsCommentPrefix: "#"}
+
 // GenerateMarkdown generates a markdown file from the input toml data.
 func GenerateMarkdown(input []byte, opts *GenerateOptions) (string, error) {
 	nodes, err := parse(input)
 	if err != nil {
 		return "", err
+	}
+
+	if opts != nil {
+		globalOpts = opts
 	}
 
 	if opts != nil && opts.DebugMode {
@@ -63,6 +73,10 @@ func GenerateMarkdownFromTemplate(templateFileName string, opts *GenerateOptions
 	data, err := os.ReadFile(templateFileName)
 	if err != nil {
 		return "", err
+	}
+
+	if opts != nil {
+		globalOpts = opts
 	}
 
 	funcMap := template.FuncMap{
@@ -156,6 +170,11 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 		node := nodes[cursor]
 		switch node.Kind {
 		case unstable.Comment:
+			if !strings.HasPrefix(string(node.Data), globalOpts.DocsCommentPrefix) {
+				// Skip the comment.
+				cursor++
+				continue
+			}
 			rawComment := processComment(string(node.Data))
 			if strings.Contains(rawComment, NoneDefault) {
 				comment.noneDefault = true
@@ -311,7 +330,7 @@ func peek(nodes []*tomlNode, i int) *tomlNode {
 // processComment removes the comment prefix and trims the spaces.
 func processComment(input string) string {
 	input2 := strings.TrimPrefix(input, " ")
-	return strings.TrimPrefix(strings.TrimPrefix(input2, "#"), " ")
+	return strings.TrimPrefix(strings.TrimLeft(input2, "#"), " ")
 }
 
 func normalize(input string, isCode bool) string {
