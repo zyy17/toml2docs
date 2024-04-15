@@ -1,4 +1,4 @@
-# 🚧 toml2docs
+# toml2docs
 
 `toml2docs` is a tool that generates a Markdown document from toml.
 
@@ -10,6 +10,7 @@ mode = "distributed"
 
 # The default timezone of the server.
 # The value should be a valid timezone name, such as `UTC`, `Local`, `Asia/Shanghai`, etc.
+# +toml2docs:none-default
 default_timezone = "UTC"
 
 # The heartbeat options for server.
@@ -50,11 +51,6 @@ timeout = "3s"
 [[processors]]
 thread_num = 2
 arch = "x86_64"
-
-# The aarch64 processor options.
-[[processors]]
-thread_num = 4
-arch = "aarch64"
 ```
 
 And it will output the following Markdown file:
@@ -62,7 +58,7 @@ And it will output the following Markdown file:
 | Key | Type | Default | Descriptions |
 | --- | -----| ------- | ----------- |
 | `mode` | String | `distributed` | The running mode of the server, can be `standalone` or `distributed`. |
-| `default_timezone` | String | `UTC` | The default timezone of the server. The value should be a valid timezone name, such as `UTC`, `Local`, `Asia/Shanghai`, etc. |
+| `default_timezone` | String | `None` | The default timezone of the server.<br/>The value should be a valid timezone name, such as `UTC`, `Local`, `Asia/Shanghai`, etc. |
 | `heartbeat` | -- | -- | The heartbeat options for server. |
 | `heartbeat.interval` | String | `5s` | Interval for sending heartbeat task. |
 | `heartbeat.retry_interval` | String | `5s` | Interval for retrying to send heartbeat task. |
@@ -72,16 +68,15 @@ And it will output the following Markdown file:
 | `postgres.runtime_size` | Integer | `2` | The runtime size of the PostgresSQL server. |
 | `postgres.tls` | -- | -- | The PostgresSQL server TLS options. |
 | `postgres.tls.mode` | String | `disable` | The mode of the PostgresSQL server TLS. |
-| `postgres.tls.cert_path` | String | -- | The certificate path of the PostgresSQL server TLS. |
-| `postgres.tls.key_path` | String | -- | The key path of the PostgresSQL server TLS. |
+| `postgres.tls.cert_path` | String | `""` | The certificate path of the PostgresSQL server TLS. |
+| `postgres.tls.key_path` | String | `""` | The key path of the PostgresSQL server TLS. |
 | `postgres.tls.watch` | Bool | `false` | Whether to watch the certificate changes of the PostgresSQL server TLS. |
 | `meta_client` | -- | -- | The meta client options. |
 | `meta_client.addrs` | Array | -- | The address of the meta servers. |
 | `meta_client.timeout` | String | `3s` | The timeout for the meta client. |
-| `processors[0].thread_num` | Integer | `2` | The x86_64 processor options. |
-| `processors[0].arch` | String | `x86_64` | -- |
-| `processors[1].thread_num` | Integer | `4` | The aarch64 processor options. |
-| `processors[1].arch` | String | `aarch64` | -- |
+| `[[processors]]` | -- | -- | The x86_64 processor options. |
+| `processors.thread_num` | Integer | `2` | The thread number of the processor. |
+| `processors.arch` | String | `x86_64` | The arch of the processor. |
 
 ## 🚀 Quick Start
 
@@ -97,6 +92,7 @@ docker run --rm \
 - `-i/--input-file`: Specifies the input toml file.
 - `-o/--output-file`: Specifies the output markdown file. If not specified, the output will be printed to stdout.
 - `-t/--template-file`: Specifies the template file.
+- `-p/--docs-comment-prefix`: Specifies the prefix of the comments that will be used as the description of the field. Default is `#`.
 
 ## Template
 
@@ -115,6 +111,14 @@ toml2docs supports generating docs from a template file. For example, you can pr
 ```
 
 Then run with the `-t/--template-file` option and the `{{ toml2docs <file> }}` section will be replaced with the generated docs.
+
+## Metadata in Comments
+
+You can add some special metadata in the comments to control the output of the field:
+
+- `+toml2docs:none-default`
+
+  There is no default value for the field. It's useful for the scenario that supports `None` value, for example, `None` in the Rust Option structure.
 
 ## Development
 
