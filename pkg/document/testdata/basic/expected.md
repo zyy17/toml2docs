@@ -2,6 +2,7 @@
 | --- | -----| ------- | ----------- |
 | `mode` | String | `distributed` | The running mode of the server, can be `standalone` or `distributed`. |
 | `default_timezone` | String | `UTC` | The default timezone of the server. |
+| `accept_methods` | Array | `None` | Accept methods |
 | `heartbeat` | -- | -- | The heartbeat options for server. |
 | `heartbeat.interval` | String | `5s` | Interval for sending heartbeat task. |
 | `heartbeat.retry_interval` | String | `5s` | Interval for retrying to send heartbeat task. |
