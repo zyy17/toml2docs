@@ -4,6 +4,10 @@ mode = "distributed"
 # The default timezone of the server.
 default_timezone = "UTC"
 
+# Accept methods
+# +toml2docs:none-default
+accept_methods = ["PLAIN"]
+
 # The heartbeat options for server.
 [heartbeat]
 # Interval for sending heartbeat task.

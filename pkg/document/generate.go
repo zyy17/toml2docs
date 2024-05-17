@@ -291,7 +291,8 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 				comment = new(tomlComment)
 			}
 		case unstable.Array:
-			cursor += 2
+			cursor += 1
+
 		default:
 			return nil, fmt.Errorf("unexpected node kind: %s", node.Kind)
 		}
