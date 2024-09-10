@@ -44,3 +44,6 @@
 | `datanode.client.tcp_nodelay` | Bool | `true` | Whether to enable `tcp_nodelay` for the datanode client. |
 | `wal` | -- | -- | The wal options. |
 | `wal.provider` | String | `local` | The provider of the wal.<br/>- `local`: use the local wal.<br/>- `remote`: use the remote wal. |
+| `engine` | -- | -- | The engine of the server. |
+| `engine.vector_cache_size` | String | `None` | Cache size for vectors and arrow arrays. Setting it to 0 to disable the cache.<br/>If not set, it's default to 1/16 of OS memory with a max limitation of 512MB. |
+| `engine.page_cache_size` | String | `None` | Cache size for pages of SST row groups. Setting it to 0 to disable the cache.<br/>If not set, it's default to 1/8 of OS memory. |
