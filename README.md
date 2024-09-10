@@ -10,7 +10,7 @@ mode = "distributed"
 
 # The default timezone of the server.
 # The value should be a valid timezone name, such as `UTC`, `Local`, `Asia/Shanghai`, etc.
-# +toml2docs:none-default
+# @toml2docs:none-default
 default_timezone = "UTC"
 
 # The heartbeat options for server.
@@ -116,9 +116,13 @@ Then run with the `-t/--template-file` option and the `{{ toml2docs <file> }}` s
 
 You can add some special metadata in the comments to control the output of the field:
 
-- `+toml2docs:none-default`
+- `@toml2docs:none-default`
 
   There is no default value for the field. It's useful for the scenario that supports `None` value, for example, `None` in the Rust Option structure.
+
+- `#+`
+
+  `toml2docs` will treat the comment as a toml field and use it to generate the document.  
 
 ## Development
 

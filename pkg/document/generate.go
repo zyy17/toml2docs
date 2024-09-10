@@ -1,6 +1,7 @@
 package document
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"regexp"
@@ -23,10 +24,13 @@ const (
 	PlaceholderForEmpty = "--"
 	BRTag               = "<br/>"
 	NoneValue           = "None"
+
+	// DocsCommentPrefix is the default prefix of the comments that will be used to generate the documentation.
+	DocsCommentPrefix = "#+"
 )
 
 const (
-	NoneDefault = "+toml2docs:none-default"
+	NoneDefault = "@toml2docs:none-default"
 )
 
 // globalOpts is the global options for generating the markdown file.
@@ -65,7 +69,7 @@ func GenerateMarkdownFromFile(filename string, opts *GenerateOptions) (string, e
 		return "", err
 	}
 
-	return GenerateMarkdown(data, opts)
+	return GenerateMarkdown(removeDocsCommentPrefix(data), opts)
 }
 
 // GenerateMarkdownFromTemplate generates a markdown file from a Go template with `toml2docs` function.
@@ -349,4 +353,19 @@ func normalize(input string, isCode bool) string {
 func reduceRedundantNewline(s string) string {
 	re := regexp.MustCompile(`\n+$`)
 	return re.ReplaceAllString(s, "\n")
+}
+
+// removeDocsCommentPrefix removes the docs comment prefix from the data to be able to parse the TOML data.
+func removeDocsCommentPrefix(data []byte) []byte {
+	var newLines []string
+	scanner := bufio.NewScanner(strings.NewReader(string(data)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, DocsCommentPrefix) {
+			line = strings.TrimSpace(strings.TrimPrefix(line, DocsCommentPrefix))
+		}
+		newLines = append(newLines, line)
+	}
+
+	return []byte(strings.Join(newLines, "\n"))
 }
