@@ -23,13 +23,17 @@ type GenerateOptions struct {
 const (
 	PlaceholderForEmpty = "--"
 	BRTag               = "<br/>"
-	NoneValue           = "None"
+	NoneValue           = "Unset"
 
 	// DocsCommentPrefix is the default prefix of the comments that will be used to generate the documentation.
 	DocsCommentPrefix = "#+"
 )
 
 const (
+	// NoneDefault is the special keyword to indicate that the field is not set to the default value.
+	// You can set the custom value by using the following format:
+	// @toml2docs:none-default="Auto"
+	// The custom value will not be displayed in the code block.
 	NoneDefault = "@toml2docs:none-default"
 )
 
@@ -117,8 +121,9 @@ type docItem struct {
 }
 
 type tomlComment struct {
-	rawComments []string
-	noneDefault bool
+	rawComments      []string
+	noneDefault      bool
+	noneDefaultValue string
 }
 
 func (c *tomlComment) String() string {
@@ -182,6 +187,12 @@ func generateDocItems(nodes []*tomlNode) ([]*docItem, error) {
 			rawComment := processComment(string(node.Data))
 			if strings.Contains(rawComment, NoneDefault) {
 				comment.noneDefault = true
+				token := strings.Split(rawComment, "=")
+				if len(token) == 2 {
+					comment.noneDefaultValue = strings.Trim(strings.TrimSpace(token[1]), "\"")
+				} else {
+					comment.noneDefaultValue = NoneValue
+				}
 			} else {
 				comment.rawComments = append(comment.rawComments, rawComment)
 			}
@@ -312,7 +323,7 @@ func doGenerateMarkdown(items []*docItem) (string, error) {
 
 	for _, item := range items {
 		if item.comment.IsNoneDefault() {
-			item.val = normalize(NoneValue, true)
+			item.val = normalize(item.comment.noneDefaultValue, false)
 		}
 		if item.typ == "String" && item.val == PlaceholderForEmpty {
 			item.val = "`\"\"`" // indicate empty string.

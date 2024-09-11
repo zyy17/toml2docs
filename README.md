@@ -116,9 +116,11 @@ Then run with the `-t/--template-file` option and the `{{ toml2docs <file> }}` s
 
 You can add some special metadata in the comments to control the output of the field:
 
-- `@toml2docs:none-default`
+- `@toml2docs:none-default=<custom-default-value>`
 
   There is no default value for the field. It's useful for the scenario that supports `None` value, for example, `None` in the Rust Option structure.
+
+  By default, the default value is `Unset` without code reference. You can also specify a custom default value by using `@toml2docs:none-default=<custom-default-value>`.
 
 - `#+`
 

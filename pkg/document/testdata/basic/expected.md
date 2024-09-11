@@ -2,7 +2,7 @@
 | --- | -----| ------- | ----------- |
 | `mode` | String | `distributed` | The running mode of the server, can be `standalone` or `distributed`. |
 | `default_timezone` | String | `UTC` | The default timezone of the server. |
-| `accept_methods` | Array | `None` | Accept methods |
+| `accept_methods` | Array | Unset | Accept methods |
 | `heartbeat` | -- | -- | The heartbeat options for server. |
 | `heartbeat.interval` | String | `5s` | Interval for sending heartbeat task. |
 | `heartbeat.retry_interval` | String | `5s` | Interval for retrying to send heartbeat task. |
@@ -45,5 +45,5 @@
 | `wal` | -- | -- | The wal options. |
 | `wal.provider` | String | `local` | The provider of the wal.<br/>- `local`: use the local wal.<br/>- `remote`: use the remote wal. |
 | `engine` | -- | -- | The engine of the server. |
-| `engine.vector_cache_size` | String | `None` | Cache size for vectors and arrow arrays. Setting it to 0 to disable the cache.<br/>If not set, it's default to 1/16 of OS memory with a max limitation of 512MB. |
-| `engine.page_cache_size` | String | `None` | Cache size for pages of SST row groups. Setting it to 0 to disable the cache.<br/>If not set, it's default to 1/8 of OS memory. |
+| `engine.vector_cache_size` | String | Auto | Cache size for vectors and arrow arrays. Setting it to 0 to disable the cache.<br/>If not set, it's default to 1/16 of OS memory with a max limitation of 512MB. |
+| `engine.page_cache_size` | String | Auto | Cache size for pages of SST row groups. Setting it to 0 to disable the cache.<br/>If not set, it's default to 1/8 of OS memory. |
